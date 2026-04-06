@@ -54,16 +54,18 @@ for r in results:
 
 ## 각 단계 자세히 보기
 
-### Embedder — 텍스트
+### Embedder — 텍스트 벡터 변환
 
 ```python
 from src.vectordb import Embedder
 
+# Embedder() 는 팩토리 함수입니다. EMBEDDING_MODEL 환경변수를 읽어 OpenAI 혹은 HuggingFace모델 중 적절한 것을 실행합니다.
 embedder = Embedder()
 ```
 
-> 처음 실행할 때 AI 모델을 다운로드합니다 (수백 MB). 시간이 걸릴 수 있어요.  
-> 두 번째 실행부터는 캐시를 써서 빠릅니다.
+> 처음 실행할 때 HFEmbedder는 모델을 다운로드합니다 (수백 MB). 시간이 걸릴 수 있습니다.  
+> 두 번째 실행부터는 HuggingFace 캐시를 써서 빠릅니다.  
+> OpenAIEmbedder는 API 호출만 하므로 즉시 실행됩니다 (단, `OPENAI_API_KEY` 필요).
 
 **여러 텍스트를 한꺼번에 변환** — 대량 저장할 때 씁니다
 
@@ -74,14 +76,22 @@ vectors = embedder.embed(texts)
 # vectors 는 리스트 안에 리스트입니다
 # [[0.1, 0.2, ...], [0.3, 0.4, ...], [0.5, 0.6, ...]]
 print(len(vectors))     # 3 (텍스트 개수)
-print(len(vectors[0]))  # 384 (벡터 차원 수)
+print(len(vectors[0]))  # 384 (벡터 차원 수, 모델마다 다름)
+print(embedder.vector_size)  # 384 (현재 모델의 벡터 차원)
 ```
 
 **텍스트 하나만 변환** — 사용자 질문을 검색할 때 씁니다
 
 ```python
 vector = embedder.embed_question("보증금을 돌려주지 않으면?")
-# [0.12, -0.34, 0.78, ...]  (숫자 384개짜리 리스트)
+# [0.12, -0.34, 0.78, ...]  (숫자 384개짜리 리스트, 모델마다 다름)
+```
+
+**현재 임베더 타입 확인:**
+
+```python
+print(type(embedder).__name__)  # "HFEmbedder" 또는 "OpenAIEmbedder"
+print(embedder.vector_size)     # 384 (HFEmbedder) 또는 1536 (OpenAIEmbedder)
 ```
 
 ---
@@ -101,6 +111,23 @@ store = QdrantStore("laws", embedder)
 
 같은 이름의 컬렉션이 이미 있으면 기존 것을 그대로 씁니다.  
 없으면 새로 만듭니다.
+
+**연결 모드 선택:**
+
+- **로컬 모드 (기본)**: `QDRANT_URL` 환경변수 미설정 시, `QDRANT_PATH`에서 로컬 파일 기반 저장소 생성
+- **클라우드 모드**: `QDRANT_URL` + `QDRANT_API_KEY` 환경변수 설정 시, Qdrant Cloud에 연결
+
+```python
+# .env
+# 로컬 모드
+QDRANT_PATH=./db
+
+# 클라우드 모드 (이 두 변수 설정 시 자동으로 Cloud 모드 활성화)
+QDRANT_URL=https://xxxxx.cloud.qdrant.io
+QDRANT_API_KEY=your-api-key
+```
+
+이제 `QdrantStore`는 추가 인자 없이 환경변수만으로 모드가 자동 선택됩니다.
 
 ---
 

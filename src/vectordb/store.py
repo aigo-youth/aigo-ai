@@ -8,25 +8,40 @@ from qdrant_client.models import Distance, PointStruct, VectorParams
 from .embedder import Embedder
 
 _DEFAULT_PATH = os.getenv("QDRANT_PATH")
+_DEFAULT_URL = os.getenv("QDRANT_URL")
+_DEFAULT_API_KEY = os.getenv("QDRANT_API_KEY")
 
 
-# TODO: 클라우드 저장으로 전환
 class QdrantStore:
   """
-  Qdrant 로컬 컬렉션 관리 및 RAG용 검색을 위한 클래스
+  Qdrant 컬렉션 관리 및 RAG용 검색을 위한 클래스
+  - QDRANT_URL 설정 시 → Cloud 모드
+  - QDRANT_URL 미설정 시 → 로컬 파일 모드 (QDRANT_PATH)
   """
-  
-  def __init__(self, collection_name: str, embedder: Embedder, path: str = _DEFAULT_PATH) -> None:
+
+  def __init__(
+    self,
+    collection_name: str,
+    embedder: Embedder,
+    path: str | None = None,
+  ) -> None:
     """
     Qdrant Store 초기화
 
     Args:
       collection_name (str): 사용할 컬렉션 이름
       embedder (Embedder): 텍스트를 임베딩으로 변환할 클래스
-      path (str, optional): Qdrant 데이터를 저장할 로컬 디렉토리 경로
+      path (str, optional): 로컬 저장 디렉토리 경로 (Cloud 모드 시 무시)
     """
-    # 로컬 기반
-    self._client = QdrantClient(path=path)
+    path = path or _DEFAULT_PATH
+
+    if _DEFAULT_URL:
+      self._client = QdrantClient(url=_DEFAULT_URL, api_key=_DEFAULT_API_KEY)
+      self._mode = "cloud"
+    else:
+      self._client = QdrantClient(path=path)
+      self._mode = "local"
+
     self._collection = collection_name
     self._embedder = embedder
     
@@ -37,11 +52,20 @@ class QdrantStore:
         collection_name=collection_name,
         vectors_config=VectorParams(
           size=embedder.vector_size,
-          # TODO: 임베딩 모델에 맞춰서 변환
-          distance=Distance.COSINE,   # 코사인 기반
+          distance=Distance.COSINE, # 코사인 유사도 사용
         ),
-      ) 
-  
+      )
+      
+  @property
+  def mode(self) -> str:
+    """현재 연결 모드 반환 ('cloud' 또는 'local')."""
+    return self._mode
+
+  @property
+  def client(self) -> QdrantClient:
+    """내부 QdrantClient 인스턴스 반환."""
+    return self._client
+
   # 문서 저장
   def add_docs(
     self,
@@ -53,7 +77,7 @@ class QdrantStore:
 
     Args:
       texts (list[str]): 임베딩할 텍스트 청크 목록
-      metadatas (list[dict[str, Any]] | None, optional): 각 텍스트에 대응하는 메타데이터 (ex. 법령, 조문번호...)
+      metadatas (list[dict[str, Any]], optional): 각 텍스트에 대응하는 메타데이터 (ex. 법령, 조문번호...)
     """
     if not texts:
       return
@@ -83,8 +107,8 @@ class QdrantStore:
     쿼리와 가장 유사한 청크 반환
 
     Args:
-        query (str): 자연어 검색 질의
-        top_k (int, optional): 반환할 topk 수(default 5)
+      query (str): 자연어 검색 질의
+      top_k (int, optional): 반환할 topk 수(default 5)
     """
     # 질의 -> 벡터 변환
     query_to_vector = self._embedder.embed_question(query)
