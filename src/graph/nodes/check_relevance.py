@@ -1,8 +1,3 @@
-"""노드 4: 검색 결과의 유사도 점수 기반 응답 가능 여부 판정.
-
-LLM 호출 없음. score threshold 비교만 수행한다.
-"""
-
 from src.config import RELEVANCE_THRESHOLD
 from src.graph.state import PipelineState
 
@@ -20,8 +15,8 @@ def check_relevance(
   검색 결과의 유사도 점수를 기준으로 응답 가능 여부를 판정
 
   Args:
-    state: 파이프라인 상태. retrieved_docs와 top_score 필요.
-    threshold: 유사도 임계값. None이면 config 기본값 사용.
+    state: 파이프라인 상태. retrieved_docs와 top_score 필요
+    threshold: 유사도 임계값. None이면 config 기본값 사용
 
   Returns:
     retrieval_passed, fallback_message, is_terminated 키가 갱신된 상태

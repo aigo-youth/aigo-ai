@@ -1,10 +1,3 @@
-"""노드 3: Qdrant에서 사용자 질의와 관련된 문서를 검색한다.
-
-LLM 호출 없음. intent_metadata의 doc_type으로 payload 필터링을 지원한다.
-"""
-
-from __future__ import annotations
-
 from functools import lru_cache
 from typing import Any
 
@@ -19,8 +12,7 @@ from src.vectordb import Embedder, QdrantStore
 def _get_store() -> QdrantStore:
   """QdrantStore 싱글턴 반환.
 
-  임베더와 컬렉션을 한 번만 초기화한다.
-  테스트에서는 이 함수를 mock으로 교체한다.
+  임베더와 컬렉션을 한 번만 초기화
   """
   embedder = Embedder(EMBEDDING_MODEL)
   return QdrantStore(
@@ -32,7 +24,8 @@ def _get_store() -> QdrantStore:
 def _build_filter(
   intent_metadata: dict[str, str] | None,
 ) -> Filter | None:
-  """intent_metadata에서 Qdrant payload 필터를 생성한다.
+  """
+  intent_metadata에서 Qdrant payload 필터를 생성한다.
 
   Args:
     intent_metadata: 의도 분류에서 태깅된 메타데이터.
