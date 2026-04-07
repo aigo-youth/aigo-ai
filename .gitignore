@@ -24,7 +24,10 @@ env/
 .ruff_cache/
 .pytest_cache/
 
+# Vector DB / embeddings
+db/
+
 # OS
 .DS_Store
 
-# data/
+.vscode
