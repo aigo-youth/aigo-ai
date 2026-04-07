@@ -3,7 +3,7 @@ from uuid import uuid4
 from typing import Any
 
 from qdrant_client import QdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, Filter, PointStruct, VectorParams
 
 from .embedder import Embedder
 
@@ -102,6 +102,7 @@ class QdrantStore:
     self,
     query: str,
     top_k: int = 5,
+    filters: Filter | None = None,
   ) -> list[dict[str, Any]]:
     """
     쿼리와 가장 유사한 청크 반환
@@ -109,6 +110,7 @@ class QdrantStore:
     Args:
       query (str): 자연어 검색 질의
       top_k (int, optional): 반환할 topk 수(default 5)
+      filters (Filter, optional): Qdrant payload 필터 (메타데이터 기반 필터링)
     """
     # 질의 -> 벡터 변환
     query_to_vector = self._embedder.embed_question(query)
@@ -116,6 +118,7 @@ class QdrantStore:
       collection_name=self._collection,
       query=query_to_vector,
       limit=top_k,
+      query_filter=filters,
     ).points
     
     return [
