@@ -12,13 +12,13 @@
 
 ### 팀원
 
-| 이름 | 역할 | GitHub |
-|------|------|--------|
-| 임정희 |  | [@](https://github.com/) |
-| 정석원 |  | [@](https://github.com/) |
-| 고아라 |  | [@](https://github.com/) |
-| 김정현 |  | [@](https://github.com/) |
-| 진세형 |  | [@](https://github.com/) |
+| 이름  | GitHub |
+|------|--------|
+| 임정희 | [bigmoon](https://github.com/bigmooon) |
+| 정석원 | [JeongSW123](https://github.com/JeongSW123) |
+| 고아라 | [Akoh-0909](https://github.com/Akoh-0909) |
+| 김정현 | [Jeich-16](https://github.com/Jeich-16) |
+| 진세형 | [gugu-eightyone](https://github.com/gugu-eightyone) |
 
 ---
 
@@ -32,7 +32,7 @@
 ### 프로젝트 소개
 - 부동산 임대차 계약은 보증금, 특약, 계약 기간 등 꼼꼼히 따져야 할 내용이 많지만, 법률 지식이 부족한 사회 초년생이나 일반 임차인이 스스로 모든 정보나 내용을 파악하기 쉽지 않습니다.
 
-- 사용자는 계약서를 업로드하거나 특약 내용을 직접 입력하여 해당 내용을 검토하고, 임대차 계약과 관련된 상황이나 궁금증을 입력하면, 법령·판례·법령해석례를 검색하여 관련 내용을 안내하고 놓치기 쉬운 확인 사항을 함께 알려주는 **RAG 기반 LLM 챗봇**입니다.
+- 사용자는 특약 내용을 직접 입력하여 해당 내용을 검토하고, 임대차 계약과 관련된 상황이나 궁금증을 입력하면, 법령·판례·법령해석례를 검색하여 관련 내용을 안내하고 놓치기 쉬운 확인 사항을 함께 알려주는 **RAG 기반 LLM 챗봇**입니다.
 
 - 부동산관련 가벼운 질문에 대한 답변 받을 수 있으며, 검색된 법령·판례·해석례 문서를 근거로 답변을 생성하므로, **근거 없는 정보 제공(할루시네이션)을 방지**하고 필요시 관련 링크를 전달 받을 수 있습니다.
 
@@ -42,6 +42,7 @@
 ### 프로젝트 배경 및 필요성
 
 #### 사회적 배경
+
 - 전세사기 피해가 사회적 문제로 나타났으며, 20 ~ 30대 청년층이 전체 피해의 75.1%를 차지했습니다. 피해의 주요 원인은 **계약 전 위험 조항 미인지**와 **특약 내용에 대한 법적 효력 무지**입니다.
 임대차 계약서에는 임차인에게 불리한 특약이 포함되는 경우가 많지만, 법률 지식이 부족한 일반인이 이를 계약 전에 스스로 파악하기는 매우 어렵습니다.
 
@@ -110,13 +111,10 @@
 3. **자연어 질의응답 (Interactive Q&A)**
    - 어려운 법 용어를 몰라도 "이 특약이 나중에 보증금을 돌려받을 때 방해가 될까요?"와 같이 일상적인 언어로 소통하며 위험 요소를 파악할 수 있습니다.
 
-
-- 다양한 입력 방식 지원: 특약 직접 입력 / 상황 설명 / 계약 조건 질의
-- 할루시네이션 방지: 내부 문서(법령·판례·해석례)에 근거한 답변만 생성
-- 민감정보(주민번호, 주소 등) 자동 마스킹 처리
-- 임차인이 계약서 독소조항·불리한 조항을 쉽게 파악할 수 있도록 지원
-- 사용자가 업로드한 계약서 PDF를 분석하여 **맞춤형 리스크 진단** 제공
-- Streamlit UI를 통한 **누구나 쉽게 접근 가능한** 서비스 구현
+>- 다양한 입력 방식 지원: 특약 직접 입력 / 상황 설명 / 계약 조건 질의
+>- 할루시네이션 방지: 내부 문서(법령·판례·해석례)에 근거한 답변만 생성
+>- 임차인이 계약서 독소조항·불리한 조항을 쉽게 파악할 수 있도록 지원
+>- Streamlit UI를 통한 **누구나 쉽게 접근 가능한** 서비스 구현
 
 
 #### 비즈니스 모델 및 시장 가치
@@ -140,10 +138,9 @@
 
 ### 주요 기능
 | 기능 | 설명 |
-|:------:|:------|
-| 계약서 업로드 | PDF 또는 이미지(JPG) 업로드 후 OCR 텍스트 추출 |
-| 민감정보 마스킹 | 주민등록번호, 주소 등 개인정보 자동 마스킹 |
+|:------|:------|
 | 조항 탐지 | 임차인에게 불리한 특약·조항 자동 분류 |
+| 개인정보 탐지 | 개인정보와 관련된 질문이 들어오면 자동 필터링 | 
 | 법령 근거 제시 | 관련 법령·판례·해석례 검색 후 근거 함께 제공 |
 | Q&A 대화형 AI 기능 | 조항 관련 추가 질문에 문서 기반 LLM 질의응답 제공 |
 
@@ -156,16 +153,19 @@
 | 분류 | 기술 |
 |------|------|
 | 사용언어 | Python |
+| UI | Streamlit |
 | 벡터데이터베이스 | Qdrant |
-| 임베딩 모델 | kure-v1 |
+| 임베딩 모델 | sentence-transformers (kure-v1) |
 | Orchestration | LangChain, LangGraph |
+| 웹 검색 | Tavily Search |
+| PDF 파싱 | pypdf |
 
 
 ### 사용 모델 (Model Specifications)
 | 구분 | 선택모델 | 주요 특징 및 채택 이유 |
 |------|------|------|
 | Embedding | kure-v1 | 한국어 법률 도메인 특화 성능 및 문장 간 유사도 측정 우수 |
-| LLM |  |  |
+| LLM | EXAONE-3.5-7.8B-Instruct | LG AI Research의 한국어 특화 오픈소스 모델, OpenAI 호환 엔드포인트(vLLM)로 연결 |
 
 
 ---
@@ -205,9 +205,56 @@
 
 ### 전처리 과정
 
+| 분류 | 전처리 내용 |
+|:---:|:---|
+| `법령` | API 수집 → 조문 단위 분리 → 청킹 (`eflaw_chunks.jsonl`) |
+| `판례` | API 수집 → 불필요 필드 제거 및 정제 → RecursiveCharacterTextSplitter로 청킹 (`prec_chunk_recursive_character.jsonl`) |
+| `법령해석례` | API 수집 → 청킹 (`expc_after_chunking.jsonl`) |
+---
+
+- 청킹된 각 문서는 `(text, metadata)` 형태로 저장되며, 메타데이터에는 doc_type·출처 ID·제목 등 검색 필터에 활용되는 정보가 포함됩니다.
+- 최종 청크는 `build_vectorstore.py` 스크립트를 통해 임베딩 후 Qdrant에 적재됩니다.
+
 ---
 
 ## 8. DB 연동 구현 코드
+
+### 적재 흐름
+
+```
+JSONL (법령/판례/법령해석례) → Loader → Embedder (kure-v1) → QdrantStore.add_docs() → Qdrant
+```
+
+### 주요 구현
+
+**Qdrant 연결** (`src/vectordb/store.py`)
+- `QDRANT_URL` 환경변수 설정 시 Cloud 모드, 미설정 시 로컬 파일 모드 자동 분기
+- 컬렉션 미존재 시 코사인 유사도 기반으로 자동 생성
+- `add_docs()`: 텍스트 임베딩 후 메타데이터와 함께 upsert
+- `search()`: 질의를 벡터로 변환 후 유사도 상위 K개 반환
+
+**데이터 로더** (`src/ingest/loaders.py`)
+
+| 함수 | doc_type | 파일 |
+|:---|:---:|:---|
+| `load_eflaw` | 법령 | `eflaw_chunks.jsonl` |
+| `load_prec` | 판례 | `prec_chunk_recursive_character.jsonl` |
+| `load_expc` | 법령해석례 | `expc_after_chunking.jsonl` |
+
+**배치 적재** (`src/ingest/indexer.py`)
+- lazy 스트리밍으로 메모리 효율 확보, 기본 배치 크기 64
+
+**RAG 검색 연동** (`src/graph/nodes/retrieve.py`)
+- `QdrantStore` 싱글턴 유지 (`@lru_cache`)
+- 의도 분류 결과의 `doc_type`을 Qdrant payload 필터로 변환하여 검색 범위 제한
+
+### 벡터스토어 빌드
+
+```bash
+python scripts/build_vectorstore.py          # 전체 적재
+python scripts/build_vectorstore.py --reset  # 컬렉션 초기화 후 재구축
+python scripts/build_vectorstore.py --dry-run  # 적재 없이 데이터 건수만 확인
+```
 
 ---
 
