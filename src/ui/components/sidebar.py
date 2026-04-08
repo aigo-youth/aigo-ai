@@ -1,6 +1,6 @@
 """사이드바 컴포넌트.
 
-새 채팅 생성 버튼과 기존 대화 목록을 렌더링한다.
+글래스모피즘 스타일의 사이드바. 네비게이션, 새 채팅, 대화 목록을 표시한다.
 """
 
 from __future__ import annotations
@@ -19,21 +19,46 @@ def render_sidebar() -> bool:
   needs_consent = False
 
   with st.sidebar:
-    st.title("부동산 특약 도우미")
+    # 로고 + 타이틀
+    st.markdown(
+      '<div style="padding: 0.5rem 0 0.25rem;">'
+      '<span style="font-size: 1.5rem; '
+      'filter: drop-shadow(0 2px 4px rgba(0,154,204,0.2));">🏠</span> '
+      '<span style="font-size: 1.15rem; font-weight: 600; '
+      'color: #009ACC; letter-spacing: -0.02em;">'
+      "부동산 특약 도우미</span></div>",
+      unsafe_allow_html=True,
+    )
     st.caption("임대차계약 특약 추천 챗봇")
 
     st.divider()
 
-    if st.button("+ 새 채팅", use_container_width=True, type="primary"):
+    # 네비게이션 항목 (레퍼런스 스타일)
+    st.markdown(
+      '<div class="nav-item"><span class="nav-icon">✏️</span> 새 채팅</div>',
+      unsafe_allow_html=True,
+    )
+
+    st.markdown(
+      '<div style="height: 0.25rem;"></div>',
+      unsafe_allow_html=True,
+    )
+
+    if st.button("＋ 새 채팅", use_container_width=True, type="primary"):
       create_chat()
       if not st.session_state.consent_given:
         needs_consent = True
 
-    st.divider()
-
     conversations = st.session_state.get("conversations", [])
+
     if conversations:
-      st.markdown("##### 대화 목록")
+      st.markdown(
+        '<p style="font-size: 0.75rem; color: #8A9BAD; '
+        'font-weight: 600; text-transform: uppercase; '
+        'letter-spacing: 0.05em; margin: 1rem 0 0.5rem;">'
+        "이전 대화</p>",
+        unsafe_allow_html=True,
+      )
       for conv in conversations:
         is_active = conv["id"] == st.session_state.get("current_chat_id")
         label = conv["title"]
@@ -45,5 +70,10 @@ def render_sidebar() -> bool:
         ):
           switch_chat(conv["id"])
           st.rerun()
+
+    # 하단 정보
+    st.markdown('<div style="height: 2rem;"></div>', unsafe_allow_html=True)
+    st.divider()
+    st.caption("법적 조언이 아닌 정보 제공 목적입니다")
 
   return needs_consent
