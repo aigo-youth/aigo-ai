@@ -21,7 +21,7 @@ EMBEDDING_MODEL: str = os.getenv(
 )
 
 # ── 컬렉션 ──────────────────────────────────────────────
-COLLECTION_NAME: str = os.getenv("COLLECTION_NAME", "lease_docs")
+COLLECTION_NAME: str = os.getenv("COLLECTION_NAME", "legal")
 
 # ── 검색 파라미터 ───────────────────────────────────────
 RETRIEVAL_TOP_K: int = int(os.getenv("RETRIEVAL_TOP_K", "5"))
