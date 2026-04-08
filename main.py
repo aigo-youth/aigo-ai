@@ -1,6 +1,5 @@
-def main():
-    print("Hello from 09-chatbot!")
 
+from src.ui.app import main
 
 if __name__ == "__main__":
-    main()
+  main()
