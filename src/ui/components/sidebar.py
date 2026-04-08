@@ -46,8 +46,8 @@ def render_sidebar() -> bool:
 
     if st.button("＋ 새 채팅", use_container_width=True, type="primary"):
       create_chat()
-      if not st.session_state.consent_given:
-        needs_consent = True
+      st.session_state.consent_given = False
+      needs_consent = True
 
     conversations = st.session_state.get("conversations", [])
 

@@ -64,6 +64,7 @@ def handle_user_message(prompt: str) -> None:
     st.caption(f"_{_DISCLAIMER}_")
 
   add_message("assistant", response)
+  st.rerun()
 
 
 def handle_pdf_input(text: str) -> None:
