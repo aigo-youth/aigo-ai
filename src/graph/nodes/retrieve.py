@@ -4,7 +4,7 @@ from typing import Any
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
 from src.config import COLLECTION_NAME, EMBEDDING_MODEL, RETRIEVAL_TOP_K
-from src.graph.state import PipelineState
+from src.graph.state import State
 from src.vectordb import Embedder, QdrantStore
 
 
@@ -51,17 +51,17 @@ def _build_filter(
   return Filter(must=conditions)
 
 
-def retrieve(state: PipelineState) -> PipelineState:
+def retrieve(state: State) -> State:
   """Qdrant에서 사용자 질의와 관련된 문서를 검색한다.
 
   Args:
-    state: 파이프라인 상태. user_query와 intent_metadata 필요.
+    state: 파이프라인 상태. user_input과 intent_metadata 필요.
 
   Returns:
-    retrieved_docs와 top_score 키가 갱신된 상태.
+    retrieved_docs와 similarity_score 키가 갱신된 상태.
   """
   store = _get_store()
-  query = state["user_query"]
+  query = state["user_input"]
   metadata = state.get("intent_metadata", {})
 
   filters = _build_filter(metadata)
@@ -71,9 +71,9 @@ def retrieve(state: PipelineState) -> PipelineState:
     filters=filters,
   )
 
-  top_score = results[0]["score"] if results else 0.0
+  similarity_score = results[0]["score"] if results else 0.0
 
   return {
     "retrieved_docs": results,
-    "top_score": top_score,
+    "similarity_score": similarity_score,     # 원본 코드에는 top_score라고 되어있었는데, 일단 similarity_score로 이름 변경
   }
