@@ -16,12 +16,14 @@ from src.graph.nodes.intent_understanding import (
   intent_understanding,
   route_after_intent_understanding,
 )
+from src.graph.nodes.query_summary import query_summary
 from src.graph.nodes.retrieve import retrieve
 from src.graph.nodes.check_relevance import (
   check_relevance,
   route_after_check_relevance,
 )
 from src.graph.nodes.generator import generator
+from src.graph.nodes.resolve_citations import resolve_citations
 from src.graph.nodes.expression_revision import expression_revision
 from src.graph.nodes.formatter import formatter
 
@@ -33,9 +35,11 @@ def build_graph() -> StateGraph:
   # ── 노드 등록 ──────────────────────────────────────
   graph.add_node("check_sensitive_info", check_sensitive_info)
   graph.add_node("intent_understanding", intent_understanding)
+  graph.add_node("query_summary", query_summary)
   graph.add_node("retrieve", retrieve)
   graph.add_node("check_relevance", check_relevance)
   graph.add_node("generator", generator)
+  graph.add_node("resolve_citations", resolve_citations)
   graph.add_node("expression_revision", expression_revision)
   graph.add_node("formatter", formatter)
 
@@ -50,12 +54,14 @@ def build_graph() -> StateGraph:
     "intent_understanding",
     route_after_intent_understanding,
   )
+  graph.add_edge("query_summary", "retrieve")
   graph.add_edge("retrieve", "check_relevance")
   graph.add_conditional_edges(
     "check_relevance",
     route_after_check_relevance,
   )
-  graph.add_edge("generator", "expression_revision")
+  graph.add_edge("generator", "resolve_citations")
+  graph.add_edge("resolve_citations", "expression_revision")
   graph.add_edge("expression_revision", "formatter")
   graph.add_edge("formatter", END)
 

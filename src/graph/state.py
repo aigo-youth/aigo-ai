@@ -12,7 +12,7 @@ class Citation(TypedDict):
   title: str          # 법령명 또는 사건명
   source_id: str      # 법령ID, 판례일련번호 등
   detail: str         # 조문번호, 사건번호 등
-  url: str | None     # 법령정보 URL
+  url: str            # 법령정보 URL (source_id 기반 결정론적 생성)
 
 
 class State(TypedDict, total=False):
@@ -46,7 +46,7 @@ class State(TypedDict, total=False):
 
   # ── 생성 ────────────────────────────────────────────
   # generated_answer: str
-  # citations: list[Citation]
+  citations: Optional[List[Citation]]
 
   # ── 출력 ────────────────────────────────────────────
   # formatted_answer: str

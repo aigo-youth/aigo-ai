@@ -1,18 +1,9 @@
-from langchain_tavily import TavilySearch
 from src.graph.state import State
 from src.llm import llm
-from langgraph.graph.message import add_messages
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, ToolMessage
-
-# Tavily 검색 도구 — PDF 5번: 링크 요청 시에만 사용
-tavily_tool = TavilySearch(max_results=3)
-
-# Tool이 바인딩된 LLM — tool_calls 응답을 낼 수 있는 버전
-llm_with_tools = llm.bind_tools([tavily_tool])
+from langchain_core.messages import HumanMessage, SystemMessage
 
 GENERATOR_SYSTEM_PROMPT = """\
 당신은 사용자의 질문에 대해 주어진 context에 기반해 답변하는 부동산 전문가입니다.
-사용자가 링크를 요청하면 'tavily' 도구를 호출하여 URL을 확보한 뒤 답변에 포함하세요.
 
 [역할(Role)]
 - 주택임대차보호법, 판례, 법령해석례를 기반으로 사용자가 계약 관련 궁금증을 해소할 수 있도록 정확한 정보를 안내합니다.
@@ -27,22 +18,17 @@ GENERATOR_SYSTEM_PROMPT = """\
 - 법률적 판단이나 개인 법률 자문은 제공하지 않습니다.
 - 간결하고 명확하게 답변하세요."""
 
-MAX_HISTORY = 10    # history 로그가 너무 길어질 것을 대비하여
-
+MAX_HISTORY = 10
 
 
 def generator(state: State) -> dict:
-    """검색 문서 기반 답변 생성 + needs_link일 때만 Tavily Tool 사용"""
-    user_input     = state['user_input']
+    """검색 문서 기반 답변 생성. 출처 URL은 resolve_citations 노드에서 처리."""
+    user_input = state['user_input']
     retrieved_docs = state.get('retrieved_docs', [])
-    needs_link     = state.get('needs_link', False)
-
-    # 최근 'MAX_HISTORY'개만큼의 채팅로그를 input받도록 설정
     history = state.get('messages', [])[-MAX_HISTORY:]
 
-    # (개선점) 'source' 확인...
     context = "\n\n".join(
-        f"[출처: {doc['metadata'].get('source', '알 수 없음')}]\n{doc['content']}"
+        f"[출처: {doc.get('title', '알 수 없음')} ({doc.get('doc_type', '')})]\n{doc.get('text', '')}"
         for doc in retrieved_docs
     )
 
@@ -52,30 +38,9 @@ def generator(state: State) -> dict:
         HumanMessage(content=f"참고 문서:\n{context}\n\n질문: {user_input}")
     ]
 
-    # generator 내장된 Tavily tool이라서 이렇게 되면 독립된 Tavily tool 노드는 없게 되는 듯 합니다...
-    if needs_link:
-        # PDF 5번 Tool: 링크 요청 시에만 Tavily 실행
-        ai_response = llm_with_tools.invoke(messages)
-
-        if hasattr(ai_response, 'tool_calls') and ai_response.tool_calls:
-            tool_call   = ai_response.tool_calls[0]
-            tool_result = tavily_tool.invoke(tool_call['args'])
-
-            # 툴 결과를 대화에 추가 후 최종 응답 생성
-            messages.append(ai_response)
-            messages.append(ToolMessage(
-                content=str(tool_result),
-                tool_call_id=tool_call['id']
-            ))
-            final_response = llm.invoke(messages)
-        else:
-            final_response = ai_response
-    else:
-        # 링크 불필요 → 일반 LLM 호출 (비용 절감)
-        final_response = llm.invoke(messages)
+    final_response = llm.invoke(messages)
 
     return {
-        'messages': [HumanMessage(content=state['user_input'])],    # messages는 사람 - Ai - 사람 - Ai 식의 티키타카 구조로 저장되기를 원함.
-                                                                    # generator에 도달했으면 fallback은 없을 것이므로 여기서 사용자의 input을 messages에 append
+        'messages': [HumanMessage(content=state['user_input'])],
         'final_answer': final_response.content,
     }
