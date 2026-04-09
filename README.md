@@ -338,7 +338,8 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 
 ## 11. 수행 결과 (테스트 / 시연페이지)
 
-(테스트/ 시연 페이지 이미지 첨부)
+<img width="1700" height="955" alt="스크린샷 2026-04-09 오후 1 55 07" src="https://github.com/user-attachments/assets/0ea04e6d-c6c9-4bdb-a983-16cf2ef4826b" />
+
 
 ---
 
