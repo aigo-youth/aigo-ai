@@ -8,6 +8,7 @@ dependencies = [
     "langchain>=1.2.15",
     "langchain-core>=0.3.0",
     "langchain-openai>=0.3.0",
+    "langchain-text-splitters>=1.0.0",
     "langchain-tavily>=0.2.17",
     "langgraph>=0.4.0",
     "matplotlib>=3.10.8",

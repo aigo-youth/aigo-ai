@@ -14,6 +14,8 @@ QDRANT_PATH=./db
 ### 2. 의존성 설치
 
 ```bash
+uv sync
+# 또는
 pip install -r requirements.txt
 ```
 
@@ -48,6 +50,69 @@ results = store.search("보증금을 돌려받으려면?", top_k=3)
 # 5단계: 결과 출력
 for r in results:
     print(r["score"], r["text"], r["조문"])
+```
+
+---
+
+## 데이터 동기화 파이프라인
+
+국가법령정보 API에서 새 데이터를 자동 수집하고, 청킹 후 벡터DB에 적재하는 통합 파이프라인입니다.
+
+### 전체 흐름
+
+```
+국가법령정보 API
+  → 목록 조회 (fetch_list)
+  → 중복 필터링 (data/meta/collected_ids.json 기반)
+  → 상세 조회 (fetch_details)
+  → raw 저장 (data/raw/*.jsonl)
+  → 청킹 (src/ingest/chunker.py)
+  │   ├─ prec(판례): RecursiveCharacterTextSplitter(500, 50)
+  │   └─ expc(법령해석례): 질의요지 + 이유 결합 (분할 없음)
+  → 벡터DB 적재 (QdrantStore.add_docs)
+```
+
+### 실행 방법
+
+```bash
+# 1회 실행: 새 데이터만 수집 → 청킹 → 적재
+uv run python scripts/sync_data.py --once
+
+# 12시간 간격으로 자동 반복
+uv run python scripts/sync_data.py --interval 12
+
+# 기본 24시간 간격 (데몬 모드)
+uv run python scripts/sync_data.py
+```
+
+- `Ctrl+C`로 안전하게 종료됩니다 (현재 작업 완료 후 종료)
+- 컬렉션 이름은 `legal` 고정 (`scripts/sync_data.py`의 `COLLECTION_NAME`)
+
+### 중복 관리
+
+수집된 문서 ID는 `data/meta/collected_ids.json`에 기록됩니다.
+
+```json
+{
+  "prec": ["615767", "616251", "616581"],
+  "expc": ["332741", "333012"]
+}
+```
+
+- 최초 실행 시 기존 `data/raw/*.jsonl`에서 ID를 자동 추출하여 초기화
+- 이후 실행마다 이미 수집된 ID는 스킵
+- 벡터DB 적재 성공 후에만 ID를 기록하여 데이터 일관성 보장
+
+### 수동 전체 재빌드
+
+동기화 파이프라인과 별개로, 기존 processed 데이터로 벡터DB를 처음부터 다시 구축할 수도 있습니다.
+
+```bash
+# 컬렉션 초기화 후 재구축
+uv run python scripts/build_vectorstore.py --reset
+
+# 테스트용 (소스별 10건만)
+uv run python scripts/build_vectorstore.py --limit 10 --dry-run
 ```
 
 ---
@@ -153,7 +218,8 @@ store.add_docs(texts=["짧은 테스트 문장"])
 ```
 
 > **주의**: 같은 텍스트를 여러 번 저장하면 중복으로 쌓입니다.  
-> 동일한 데이터를 다시 넣을 때는 저장소를 초기화하거나 중복을 체크하세요.
+> `sync_data.py`를 사용하면 `collected_ids.json` 기반으로 중복이 자동 방지됩니다.  
+> 수동으로 `add_docs`를 호출할 때는 저장소를 초기화하거나 중복을 직접 체크하세요.
 
 ---
 
@@ -202,7 +268,10 @@ for r in results:
 
 ## 자주 쓰는 패턴
 
-### 법령 데이터를 한꺼번에 불러와서 저장
+### 법령 데이터를 한꺼번에 불러와서 저장 (수동 적재)
+
+> 일반적으로는 `sync_data.py`가 수집~적재를 자동 처리합니다.  
+> 아래는 커스텀 데이터를 직접 적재해야 할 때 사용하세요.
 
 ```python
 from src.vectordb import Embedder, QdrantStore
