@@ -327,13 +327,18 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 
 ## 9. 테스트 계획 및 결과 보고서
 ### 테스트 계획
+1. 임베딩 모델 테스트
+2. 노드 별 유닛테스트
+3. 개선 전 RAG Pipeline 테스트
+4. 개선 후 RAG Pipeline 테스트
 
 ### 테스트 결과
 
 ---
 
 ## 10. 진행 과정 중 프로그램 개선 노력
-1. 
+1. **query summary 노드 추가**
+   - 사용자 입력을 LLM으로 전처리하여 유사도 검색을 위한 핵심 질문 및 요청사항을 요약하는 노드 추가
 
 ---
 
