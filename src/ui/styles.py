@@ -432,15 +432,15 @@ def welcome_html() -> str:
   """웰컴 화면 HTML을 반환한다."""
   return """
 <div class="welcome-card">
-  <div class="welcome-mascot">🏠</div>
+  <div class="welcome-mascot">📋</div>
   <h2>무엇을 도와드릴까요?</h2>
   <p class="welcome-sub">
     임대차계약서를 분석하고, 관련 법령과 판례를 기반으로<br>
-    적절한 특약을 추천해 드립니다.
+    계약 조항을 검토해 드립니다.
   </p>
   <div class="category-grid">
     <div class="category-pill">
-      <span class="category-icon">📋</span> 특약 추천
+      <span class="category-icon">📋</span> 조항 검토
     </div>
     <div class="category-pill">
       <span class="category-icon">⚖️</span> 분쟁 대응

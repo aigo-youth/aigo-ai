@@ -103,8 +103,8 @@ def handle_pdf_input(text: str) -> None:
 def main() -> None:
   """Streamlit 앱 진입점."""
   st.set_page_config(
-    page_title="부동산 특약 도우미",
-    page_icon="🏠",
+    page_title="아이고 청년",
+    page_icon="📋",
     layout="wide",
     initial_sidebar_state="expanded",
   )

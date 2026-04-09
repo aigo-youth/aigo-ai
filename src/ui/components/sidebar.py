@@ -23,13 +23,13 @@ def render_sidebar() -> bool:
     st.markdown(
       '<div style="padding: 0.5rem 0 0.25rem;">'
       '<span style="font-size: 1.5rem; '
-      'filter: drop-shadow(0 2px 4px rgba(0,154,204,0.2));">🏠</span> '
+      'filter: drop-shadow(0 2px 4px rgba(0,154,204,0.2));">📋</span> '
       '<span style="font-size: 1.15rem; font-weight: 600; '
       'color: #009ACC; letter-spacing: -0.02em;">'
-      "부동산 특약 도우미</span></div>",
+      "아이고 청년</span></div>",
       unsafe_allow_html=True,
     )
-    st.caption("임대차계약 특약 추천 챗봇")
+    st.caption("AI 기반 부동산 계약 조항 검토 서비스")
 
     st.divider()
 
