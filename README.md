@@ -340,6 +340,8 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 1. **query summary 노드 추가**
    - 사용자 입력을 LLM으로 전처리하여 유사도 검색을 위한 핵심 질문 및 요청사항을 요약하는 노드 추가
 
+2. **resolve citation 노드 추가**
+ - 근거 링크를 잘 가져오기 위한 노드 추가
 ---
 
 ## 11. 수행 결과
