@@ -334,6 +334,9 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 
 ### 테스트 결과
 
+<img width="522" height="309" alt="스크린샷 2026-04-09 오후 3 52 48" src="https://github.com/user-attachments/assets/2cf45989-ba5c-4871-a421-495d14be1070" />
+
+
 ---
 
 ## 10. 진행 과정 중 프로그램 개선 노력
