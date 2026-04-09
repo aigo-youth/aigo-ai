@@ -337,15 +337,16 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 
 <img width="522" height="309" alt="스크린샷 2026-04-09 오후 3 52 48" src="https://github.com/user-attachments/assets/2cf45989-ba5c-4871-a421-495d14be1070" />
 
-
 ---
 
 ## 10. 진행 과정 중 프로그램 개선 노력
-1. **query summary 노드 추가**
-   - 사용자 입력을 LLM으로 전처리하여 유사도 검색을 위한 핵심 질문 및 요청사항을 요약하는 노드 추가
+1. **사용자 질문이 길어지면 유사도가 낮게 나옴**
+   - `query_summary` 노드를 추가하여 사용자 입력을 LLM으로 전처리해 유사도 검색을 위한 핵심 질문 및 요청사항을 요약
 
-2. **resolve citation 노드 추가**
- - 근거 링크를 잘 가져오기 위한 노드 추가
+2. **해당 답변 생성 근거에 대한 직접적인 링크를 가져오지 못함**
+  - `resolve_citations` 노드를 추가하여 이를 개선
+  
+   
 ---
 
 ## 11. 수행 결과
@@ -355,7 +356,11 @@ https://github.com/SKNETWORKS-FAMILY-AICAMP/SKN24-3rd-6Team/blob/main/scripts/bu
 
 ---
 
-## 12. 한줄 회고 
+## 12. 이후 프로그램 개선 사항
+
+---
+
+## 13. 한줄 회고 
 
 | 이름 | 한 줄 회고 |
 |:------:|:-----------|
