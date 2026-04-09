@@ -20,3 +20,4 @@ if LLM_BASE_URL:
   _kwargs["base_url"] = LLM_BASE_URL
 
 llm = ChatOpenAI(**_kwargs)
+streaming_llm = ChatOpenAI(**_kwargs, streaming=True)

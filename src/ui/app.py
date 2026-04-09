@@ -10,7 +10,7 @@ import streamlit as st
 
 import logging
 
-from src.graph import run as run_graph
+from src.graph import run_preformat, stream_formatter
 from src.ui.components.chat import render_chat_history, render_chat_input
 from src.ui.components.consent import show_consent_dialog
 from src.ui.components.sidebar import render_sidebar
@@ -23,33 +23,21 @@ _ERROR_MSG = "죄송합니다, 일시적인 오류가 발생했습니다. 잠시
 logger = logging.getLogger(__name__)
 
 
-def run_pipeline(query: str, input_type: str = "text") -> str:
-  """LangGraph 파이프라인을 실행하여 응답을 생성한다.
-
-  Args:
-    query: 사용자 질의 또는 추출된 계약서 텍스트.
-    input_type: "text" 또는 "pdf".
-
-  Returns:
-    생성된 응답 텍스트.
-  """
+def _run_with_loading(query: str, placeholder) -> dict:
+  """dot loading을 표시하면서 pre-format 파이프라인을 실행한다."""
+  placeholder.markdown(dot_loading_html(), unsafe_allow_html=True)
   try:
-    result = run_graph(query)
-    return (
-      result.get("fallback_message")
-      or result.get("final_answer")
-      or _ERROR_MSG
-    )
+    return run_preformat(query)
   except Exception:
     logger.exception("파이프라인 실행 중 오류 발생")
-    return _ERROR_MSG
+    return {"fallback_message": _ERROR_MSG}
 
 
 # ── 메시지 처리 ──────────────────────────────────────────
 
 
 def handle_user_message(prompt: str) -> None:
-  """사용자 메시지를 처리하고 응답을 생성한다."""
+  """사용자 메시지를 처리하고 스트리밍으로 응답을 생성한다."""
   add_message("user", prompt)
 
   with st.chat_message("user"):
@@ -57,9 +45,23 @@ def handle_user_message(prompt: str) -> None:
 
   with st.chat_message("assistant"):
     placeholder = st.empty()
-    placeholder.markdown(dot_loading_html(), unsafe_allow_html=True)
-    response = run_pipeline(prompt, input_type="text")
-    placeholder.markdown(response)
+
+    # 1) dot loading 표시 + pre-format 파이프라인 실행
+    state = _run_with_loading(prompt, placeholder)
+
+    # 2) fallback 경로 (민감 정보, 관련성 부족 등)
+    fallback = state.get("fallback_message")
+    if fallback:
+      placeholder.markdown(fallback)
+      response = fallback
+    elif not state.get("final_answer"):
+      placeholder.markdown(_ERROR_MSG)
+      response = _ERROR_MSG
+    else:
+      # 3) dot loading 제거 후 formatter 스트리밍
+      placeholder.empty()
+      response = st.write_stream(stream_formatter(state))
+
     st.caption(f"_{_DISCLAIMER}_")
 
   add_message("assistant", response)
@@ -67,7 +69,7 @@ def handle_user_message(prompt: str) -> None:
 
 
 def handle_pdf_input(text: str) -> None:
-  """PDF에서 추출된 텍스트를 파이프라인에 전달한다."""
+  """PDF에서 추출된 텍스트를 스트리밍으로 파이프라인에 전달한다."""
   summary = f"[계약서 업로드됨] ({len(text)}자 추출)\n\n> {text[:200]}..."
   add_message("user", summary)
 
@@ -76,9 +78,20 @@ def handle_pdf_input(text: str) -> None:
 
   with st.chat_message("assistant"):
     placeholder = st.empty()
-    placeholder.markdown(dot_loading_html(), unsafe_allow_html=True)
-    response = run_pipeline(text, input_type="pdf")
-    placeholder.markdown(response)
+
+    state = _run_with_loading(text, placeholder)
+
+    fallback = state.get("fallback_message")
+    if fallback:
+      placeholder.markdown(fallback)
+      response = fallback
+    elif not state.get("final_answer"):
+      placeholder.markdown(_ERROR_MSG)
+      response = _ERROR_MSG
+    else:
+      placeholder.empty()
+      response = st.write_stream(stream_formatter(state))
+
     st.caption(f"_{_DISCLAIMER}_")
 
   add_message("assistant", response)
