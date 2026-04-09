@@ -93,4 +93,4 @@ def route_after_intent_understanding(state: State) -> str:
     if state['is_definitive']:
         print(state['fallback_message'])
 
-    return END if state['is_definitive'] else 'retrieve'
+    return END if state['is_definitive'] else 'query_summary'

@@ -32,7 +32,7 @@ MAX_HISTORY = 10    # history 로그가 너무 길어질 것을 대비하여
 
 
 def generator(state: State) -> dict:
-    """PDF 5번: 검색 문서 기반 답변 생성 + needs_link일 때만 Tavily Tool 사용"""
+    """검색 문서 기반 답변 생성 + needs_link일 때만 Tavily Tool 사용"""
     user_input     = state['user_input']
     retrieved_docs = state.get('retrieved_docs', [])
     needs_link     = state.get('needs_link', False)
@@ -75,5 +75,7 @@ def generator(state: State) -> dict:
         final_response = llm.invoke(messages)
 
     return {
+        'messages': [HumanMessage(content=state['user_input'])],    # messages는 사람 - Ai - 사람 - Ai 식의 티키타카 구조로 저장되기를 원함.
+                                                                    # generator에 도달했으면 fallback은 없을 것이므로 여기서 사용자의 input을 messages에 append
         'final_answer': final_response.content,
     }

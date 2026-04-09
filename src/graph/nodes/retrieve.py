@@ -63,7 +63,7 @@ def retrieve(state: State) -> State:
     retrieved_docs와 similarity_score 키가 갱신된 상태.
   """
   store = _get_store()
-  query = state["user_query"]
+  query = state.get("user_query") or state["user_input"]
   metadata = state.get("intent_metadata", {})
 
   filters = _build_filter(metadata)
