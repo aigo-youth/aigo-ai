@@ -1,4 +1,4 @@
-# 프로젝트명
+# 🏠 AI기반 부동산 계약 조항 검토 서비스
 
 > SK네트웍스 Family AI 캠프 24기 3차 프로젝트
 
@@ -21,8 +21,6 @@
 | 진세형 | [gugu-eightyone](https://github.com/gugu-eightyone) |
 
 ---
-
-# 🏠 AI기반 부동산 계약 조항 검토 서비스
 
 ## 2. 프로젝트 개요
 
