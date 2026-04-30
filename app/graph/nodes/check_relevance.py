@@ -1,7 +1,7 @@
 from langgraph.graph import END
 
-from app.config import RELEVANCE_THRESHOLD
 from app.graph.state import State
+from app.settings import settings
 
 _FALLBACK_MSG_CR = (
   "죄송합니다, 해당 질문에 대한 정확한 답변을 찾지 못했습니다. "
@@ -23,7 +23,7 @@ def check_relevance(
   Returns:
     retrieval_passed, fallback_message, is_terminated 키가 갱신된 상태
   """
-  threshold = threshold if threshold is not None else RELEVANCE_THRESHOLD
+  threshold = threshold if threshold is not None else settings.RELEVANCE_THRESHOLD
   docs = state.get("retrieved_docs", [])
   similarity_score = state.get("similarity_score", 0.0)
 

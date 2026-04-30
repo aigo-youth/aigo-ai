@@ -8,16 +8,16 @@ from __future__ import annotations
 
 from langchain_openai import ChatOpenAI
 
-from app.config import LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
+from app.settings import settings
 
 _kwargs: dict = {
-  "model": LLM_MODEL,
-  "api_key": LLM_API_KEY,
+  "model": settings.LLM_MODEL,
+  "api_key": settings.LLM_API_KEY,
   "temperature": 0.3,
 }
 
-if LLM_BASE_URL:
-  _kwargs["base_url"] = LLM_BASE_URL
+if settings.LLM_BASE_URL:
+  _kwargs["base_url"] = settings.LLM_BASE_URL
 
 llm = ChatOpenAI(**_kwargs)
 streaming_llm = ChatOpenAI(**_kwargs, streaming=True)

@@ -12,9 +12,9 @@ from dotenv import load_dotenv
 
 load_dotenv(ROOT / ".env")
 
-from src.api.collector import fetch_details, fetch_list, save_raw
-from src.ingest.chunker import chunk_expc, chunk_prec
-from src.vectordb import Embedder, QdrantStore
+from app.clients.collector import fetch_details, fetch_list, save_raw
+from app.ingest.chunker import chunk_expc, chunk_prec
+from app.vectordb import Embedder, QdrantStore
 
 logging.basicConfig(
     level=logging.INFO,

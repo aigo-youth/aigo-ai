@@ -1,7 +1,7 @@
 [project]
-name = "09-chatbot"
+name = "aigo-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Aigo Youth FastAPI 기반 법률 RAG 챗봇 백엔드"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -22,9 +22,13 @@ dependencies = [
     "requests>=2.33.1",
     "scikit-learn>=1.8.0",
     "sentence-transformers>=3.0.0",
-    "streamlit>=1.45.0",
     "torch>=2.11.0",
     "torchvision>=0.26.0",
+    "fastapi>=0.136.1",
+    "uvicorn>=0.46.0",
+    "pydantic>=2.12.5",
+    "pydantic-settings>=2.14.0",
+    "structlog>=25.5.0",
 ]
 
 [dependency-groups]
@@ -37,9 +41,5 @@ dev = [
 testpaths = ["tests"]
 pythonpath = ["."]
 
-# 의존성 관리
-# - uv 사용자: `uv sync`
-# - pip 사용자: `pip install -r requirements.txt`
-# requirements.txt는 `uv export --no-hashes --no-annotate -o requirements.txt`로 생성됨
-# 새 패키지 추가 후 반드시 requirements.txt를 재생성할 것
+# 의존성 관리: `uv sync` (lock 갱신은 `uv lock`)
 
