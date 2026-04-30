@@ -1,4 +1,4 @@
-from src.pdf_graph.state import PDF_State
+from app.pdf_graph.state import PDF_State
 import fitz
 import numpy as np
 

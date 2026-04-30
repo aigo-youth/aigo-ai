@@ -1,5 +1,5 @@
-from src.pdf_graph.state import PDF_State
-from src.llm import llm
+from app.pdf_graph.state import PDF_State
+from app.llm import llm
 from langchain_core.messages import HumanMessage, SystemMessage
 
 EXTRACTOR_PROMPT = """

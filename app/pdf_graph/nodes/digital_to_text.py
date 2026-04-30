@@ -1,4 +1,4 @@
-from src.pdf_graph.state import PDF_State
+from app.pdf_graph.state import PDF_State
 import fitz
 
 def digital_to_text(state: PDF_State) -> dict:
