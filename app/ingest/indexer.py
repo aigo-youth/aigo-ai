@@ -1,5 +1,5 @@
 from typing import Callable, Iterator
-from src.vectordb import QdrantStore
+from app.vectordb import QdrantStore
 from .loaders import LoadedChunk
 
 LoaderFn = Callable[[str], Iterator[LoadedChunk]]
