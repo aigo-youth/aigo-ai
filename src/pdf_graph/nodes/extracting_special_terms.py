@@ -1,4 +1,4 @@
-from src.pdf_graph.state import State
+from src.pdf_graph.state import PDF_State
 from src.llm import llm
 from langchain_core.messages import HumanMessage, SystemMessage
 
