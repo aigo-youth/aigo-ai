@@ -3,9 +3,9 @@ from typing import Any
 
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
-from src.config import COLLECTION_NAME, EMBEDDING_MODEL, RETRIEVAL_TOP_K
-from src.graph.state import State
-from src.vectordb import Embedder, QdrantStore
+from app.config import COLLECTION_NAME, EMBEDDING_MODEL, RETRIEVAL_TOP_K
+from app.graph.state import State
+from app.vectordb import Embedder, QdrantStore
 
 
 @lru_cache(maxsize=1)

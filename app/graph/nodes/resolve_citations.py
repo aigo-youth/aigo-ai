@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from src.graph.state import Citation, State
+from app.graph.state import Citation, State
 
 _BASE_URL = "https://www.law.go.kr"
 

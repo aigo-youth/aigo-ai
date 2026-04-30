@@ -1,6 +1,6 @@
 import json
-from src.graph.state import State
-from src.llm import llm
+from app.graph.state import State
+from app.llm import llm
 from langchain_core.messages import HumanMessage, SystemMessage
 
 ### 질문 요지 추출(요약) + 질문자 요청 사항 요약 = 질문 전처리

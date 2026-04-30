@@ -2,8 +2,8 @@ import json
 
 from langgraph.graph import END
 from langchain_core.messages import HumanMessage, SystemMessage
-from src.graph.state import State
-from src.llm import llm
+from app.graph.state import State
+from app.llm import llm
 
 
 # source가 꼭 필요할까...? 어떤 출력값이길 원하는거지???

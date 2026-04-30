@@ -1,7 +1,7 @@
 from langgraph.graph import END
 
-from src.config import RELEVANCE_THRESHOLD
-from src.graph.state import State
+from app.config import RELEVANCE_THRESHOLD
+from app.graph.state import State
 
 _FALLBACK_MSG_CR = (
   "죄송합니다, 해당 질문에 대한 정확한 답변을 찾지 못했습니다. "

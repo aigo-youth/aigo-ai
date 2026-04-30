@@ -10,30 +10,30 @@ from collections.abc import Generator
 from langchain_core.messages import HumanMessage, SystemMessage
 from langgraph.graph import END, StateGraph
 
-from src.graph.state import State
-from src.graph.nodes.check_sensitive_info import (
+from app.graph.state import State
+from app.graph.nodes.check_sensitive_info import (
   check_sensitive_info,
   route_after_check_sensitive_info,
 )
-from src.graph.nodes.intent_understanding import (
+from app.graph.nodes.intent_understanding import (
   intent_understanding,
   route_after_intent_understanding,
 )
-from src.graph.nodes.query_summary import query_summary
-from src.graph.nodes.retrieve import retrieve
-from src.graph.nodes.check_relevance import (
+from app.graph.nodes.query_summary import query_summary
+from app.graph.nodes.retrieve import retrieve
+from app.graph.nodes.check_relevance import (
   check_relevance,
   route_after_check_relevance,
 )
-from src.graph.nodes.generator import generator
-from src.graph.nodes.resolve_citations import resolve_citations
-from src.graph.nodes.expression_revision import expression_revision
-from src.graph.nodes.formatter import (
+from app.graph.nodes.generator import generator
+from app.graph.nodes.resolve_citations import resolve_citations
+from app.graph.nodes.expression_revision import expression_revision
+from app.graph.nodes.formatter import (
   formatter,
   FORMATTER_SYSTEM_PROMPT,
   _build_citation_section,
 )
-from src.llm import streaming_llm
+from app.llm import streaming_llm
 
 
 def build_graph(*, include_formatter: bool = True) -> StateGraph:
