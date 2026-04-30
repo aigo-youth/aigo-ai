@@ -19,14 +19,14 @@ OC=발급받은_인증키
 ### 2. 의존성 설치
 
 ```bash
-pip install -r requirements.txt
+uv sync
 ```
 
 ---
 
 ## `api()` 함수
 
-**위치**: `src/api/api.py`
+**위치**: `app/clients/api.py`
 
 ### 파라미터
 

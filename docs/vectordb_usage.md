@@ -15,8 +15,6 @@ QDRANT_PATH=./db
 
 ```bash
 uv sync
-# 또는
-pip install -r requirements.txt
 ```
 
 ---
@@ -24,7 +22,7 @@ pip install -r requirements.txt
 ## 기본 사용법 (전체 흐름)
 
 ```python
-from src.vectordb import Embedder, QdrantStore
+from app.vectordb import Embedder, QdrantStore
 
 embedder = Embedder()
 
@@ -66,7 +64,7 @@ for r in results:
   → 중복 필터링 (data/meta/collected_ids.json 기반)
   → 상세 조회 (fetch_details)
   → raw 저장 (data/raw/*.jsonl)
-  → 청킹 (src/ingest/chunker.py)
+  → 청킹 (app/ingest/chunker.py)
   │   ├─ prec(판례): RecursiveCharacterTextSplitter(500, 50)
   │   └─ expc(법령해석례): 질의요지 + 이유 결합 (분할 없음)
   → 벡터DB 적재 (QdrantStore.add_docs)
@@ -122,7 +120,7 @@ uv run python scripts/build_vectorstore.py --limit 10 --dry-run
 ### Embedder — 텍스트 벡터 변환
 
 ```python
-from src.vectordb import Embedder
+from app.vectordb import Embedder
 
 # Embedder() 는 팩토리 함수입니다. EMBEDDING_MODEL 환경변수를 읽어 OpenAI 혹은 HuggingFace모델 중 적절한 것을 실행합니다.
 embedder = Embedder()
@@ -166,7 +164,7 @@ print(embedder.vector_size)     # 384 (HFEmbedder) 또는 1536 (OpenAIEmbedder)
 #### 초기화
 
 ```python
-from src.vectordb import Embedder, QdrantStore
+from app.vectordb import Embedder, QdrantStore
 
 embedder = Embedder()
 store = QdrantStore("laws", embedder)
@@ -274,7 +272,7 @@ for r in results:
 > 아래는 커스텀 데이터를 직접 적재해야 할 때 사용하세요.
 
 ```python
-from src.vectordb import Embedder, QdrantStore
+from app.vectordb import Embedder, QdrantStore
 
 embedder = Embedder()
 store = QdrantStore("laws", embedder)

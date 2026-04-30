@@ -3,8 +3,8 @@ from typing import Any
 
 from qdrant_client.models import FieldCondition, Filter, MatchValue
 
-from app.config import COLLECTION_NAME, EMBEDDING_MODEL, RETRIEVAL_TOP_K
 from app.graph.state import State
+from app.settings import settings
 from app.vectordb import Embedder, QdrantStore
 
 
@@ -14,9 +14,9 @@ def _get_store() -> QdrantStore:
 
   임베더와 컬렉션을 한 번만 초기화
   """
-  embedder = Embedder(EMBEDDING_MODEL)
+  embedder = Embedder(settings.EMBEDDING_MODEL)
   return QdrantStore(
-    collection_name=COLLECTION_NAME,
+    collection_name=settings.COLLECTION_LEGAL,
     embedder=embedder,
   )
 
@@ -69,7 +69,7 @@ def retrieve(state: State) -> State:
   filters = _build_filter(metadata)
   results: list[dict[str, Any]] = store.search(
     query=query,
-    top_k=RETRIEVAL_TOP_K,
+    top_k=settings.RETRIEVAL_TOP_K,
     filters=filters,
   )
 

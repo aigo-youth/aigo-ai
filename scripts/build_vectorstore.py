@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 
 load_dotenv(ROOT / ".env")
 
-from src.ingest import build_index, load_eflaw, load_expc, load_prec
-from src.vectordb import Embedder, QdrantStore
+from app.ingest import build_index, load_eflaw, load_expc, load_prec
+from app.vectordb import Embedder, QdrantStore
 DEFAULT_COLLECTION = "legal"
 
 DEFAULT_SOURCES = [
@@ -58,7 +58,7 @@ def _maybe_reset(store: QdrantStore, collection: str) -> None:
 
 def _dry_run(sources: list, limit: int | None) -> None:
   """데이터 로딩만 수행하여 건수를 확인한다."""
-  from src.ingest.indexer import _take
+  from app.ingest.indexer import _take
 
   print("[dry-run] 데이터 로딩 검증 (Qdrant 적재 없음)\n")
   total = 0
