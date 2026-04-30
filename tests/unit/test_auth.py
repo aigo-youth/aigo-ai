@@ -1,51 +1,49 @@
+"""verify_internal_api_key 의존성 테스트 (API 명세 0.1 / 6.x)."""
+
 import pytest
 from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 
-from app.core.auth import verify_service_token
+from app.core.auth import verify_internal_api_key
 
 
 @pytest.fixture
 def protected_app():
-    """인증이 필요한 테스트 FastAPI 앱 생성"""
+    """X-Internal-Api-Key 검증이 필요한 테스트용 FastAPI 앱."""
     app = FastAPI()
 
-    @app.get("/protected", dependencies=[Depends(verify_service_token)])
+    @app.get("/protected", dependencies=[Depends(verify_internal_api_key)])
     async def protected():
         return {"ok": True}
 
     return TestClient(app)
 
 
-def test_missing_token_returns_401(protected_app):
-    """토큰이 없는 경우 401 반환 테스트"""
-    response = protected_app.get("/protected")
-    assert response.status_code == 401
+def test_missing_header_returns_401(protected_app):
+    resp = protected_app.get("/protected")
+    assert resp.status_code == 401
 
 
-def test_invalid_token_returns_401(protected_app):
-    """유효하지 않은 토큰인 경우 401 반환 테스트"""
-    response = protected_app.get(
+def test_invalid_key_returns_401(protected_app):
+    resp = protected_app.get(
         "/protected",
-        headers={"X-Service-Token": "wrong-token"},
+        headers={"X-Internal-Api-Key": "wrong-key"},
     )
-    assert response.status_code == 401
+    assert resp.status_code == 401
 
 
-def test_valid_token_returns_200(protected_app):
-    """유효한 토큰인 경우 200 반환 테스트"""
-    response = protected_app.get(
+def test_valid_key_returns_200(protected_app):
+    resp = protected_app.get(
         "/protected",
-        headers={"X-Service-Token": "test-secret"},
+        headers={"X-Internal-Api-Key": "test-secret"},
     )
-    assert response.status_code == 200
-    assert response.json() == {"ok": True}
+    assert resp.status_code == 200
+    assert resp.json() == {"ok": True}
 
 
-def test_empty_token_returns_401(protected_app):
-    """빈 토큰인 경우 401 반환 테스트"""
-    response = protected_app.get(
+def test_empty_key_returns_401(protected_app):
+    resp = protected_app.get(
         "/protected",
-        headers={"X-Service-Token": ""},
+        headers={"X-Internal-Api-Key": ""},
     )
-    assert response.status_code == 401
+    assert resp.status_code == 401
