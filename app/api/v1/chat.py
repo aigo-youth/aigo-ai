@@ -1,6 +1,6 @@
 import asyncio
 
-from fastapi import APIRouter, Depends, Header, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, Request, status
 from fastapi.responses import StreamingResponse
 
 from app.api.v1.schemas import ChatStreamRequest
@@ -19,6 +19,11 @@ _SSE_HEADERS = {
     "Connection": "keep-alive",
 }
 
+# 클라이언트(프록시) 연결 유지를 위한 heartbeat 주기
+# — 코멘트 라인은 SSE 파서가 무시
+_KEEPALIVE_INTERVAL = 30.0
+_PING_FRAME = ": ping\n\n"
+
 
 @router.post(
     "/stream",
@@ -26,6 +31,7 @@ _SSE_HEADERS = {
     summary="채팅 RAG SSE 스트리밍 (Django → FastAPI 내부 호출)",
 )
 async def chat_stream(
+    request: Request,
     payload: ChatStreamRequest,
     x_user_id: str | None = Header(default=None, alias="X-User-Id"),
     x_chatroom_id: str | None = Header(default=None, alias="X-Chatroom-Id"),
@@ -55,25 +61,57 @@ async def chat_stream(
         payload.contract_context.model_dump() if payload.contract_context else None
     )
 
-    async def event_stream():
+    async def _producer(queue: asyncio.Queue) -> None:
         try:
             async for ev in chat_service.stream_chat(
                 query=payload.query,
                 history=history,
                 contract_context=contract_context,
             ):
-                yield format_sse_event(ev["event"], ev["data"])
+                await queue.put(("event", ev))
+            await queue.put(("done", None))
         except asyncio.CancelledError:
             raise
         except Exception as exc:
             logger.error("chat_stream.failed", error=str(exc))
-            yield format_sse_event(
-                "error",
-                {
-                    "code": "INTERNAL_ERROR",
-                    "message": "응답 생성 중 오류가 발생했습니다.",
-                },
-            )
+            await queue.put(("error", None))
+
+    async def event_stream():
+        queue: asyncio.Queue = asyncio.Queue()
+        producer_task = asyncio.create_task(_producer(queue))
+        try:
+            while True:
+                if await request.is_disconnected():
+                    logger.info("chat_stream.client_disconnected", user_id=x_user_id)
+                    break
+                try:
+                    kind, ev = await asyncio.wait_for(
+                        queue.get(), timeout=_KEEPALIVE_INTERVAL
+                    )
+                except asyncio.TimeoutError:
+                    yield _PING_FRAME
+                    continue
+
+                if kind == "event":
+                    yield format_sse_event(ev["event"], ev["data"])
+                elif kind == "done":
+                    break
+                elif kind == "error":
+                    yield format_sse_event(
+                        "error",
+                        {
+                            "code": "INTERNAL_ERROR",
+                            "message": "응답 생성 중 오류가 발생했습니다.",
+                        },
+                    )
+                    break
+        finally:
+            if not producer_task.done():
+                producer_task.cancel()
+                try:
+                    await producer_task
+                except asyncio.CancelledError:
+                    pass
 
     return StreamingResponse(
         event_stream(),
