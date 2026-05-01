@@ -6,6 +6,7 @@ def _patch_qdrant(monkeypatch, ok: bool) -> None:
 
 
 def test_healthz_returns_ready_when_qdrant_up(client, monkeypatch):
+    """Qdrant 연결 OK → 200 + status="ready", 응답에 model 정보 포함."""
     _patch_qdrant(monkeypatch, True)
 
     resp = client.get("/healthz")
@@ -19,6 +20,7 @@ def test_healthz_returns_ready_when_qdrant_up(client, monkeypatch):
 
 
 def test_healthz_returns_loading_when_qdrant_down(client, monkeypatch):
+    """Qdrant 미연결 → 503 + status="loading" + ready_in_seconds 노출."""
     _patch_qdrant(monkeypatch, False)
 
     resp = client.get("/healthz")
