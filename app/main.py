@@ -24,7 +24,7 @@ async def lifespan(_app: FastAPI):
 app = FastAPI(
     title="aigo-ai",
     version=__version__,
-    description="Aigo Youth FastAPI 기반 법률 RAG 챗봇 백엔드",
+    description="아이고 청년 AI Internal API",
     lifespan=lifespan,
 )
 
