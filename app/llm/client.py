@@ -1,23 +1,17 @@
-"""LLM 클라이언트 초기화.
-
-RunPod vLLM 등 OpenAI 호환 엔드포인트를 ChatOpenAI로 연결한다.
-LLM_BASE_URL이 비어 있으면 OpenAI 기본 엔드포인트를 사용한다.
-"""
-
-from __future__ import annotations
-
 from langchain_openai import ChatOpenAI
 
 from app.settings import settings
 
 _kwargs: dict = {
-  "model": settings.LLM_MODEL,
-  "api_key": settings.LLM_API_KEY,
-  "temperature": 0.3,
+    "model": settings.LLM_MODEL,
+    "api_key": settings.LLM_API_KEY,
+    "temperature": 0.3,
+    "timeout": 30,
+    "max_retries": 1,
 }
 
 if settings.LLM_BASE_URL:
-  _kwargs["base_url"] = settings.LLM_BASE_URL
+    _kwargs["base_url"] = settings.LLM_BASE_URL
 
 llm = ChatOpenAI(**_kwargs)
 streaming_llm = ChatOpenAI(**_kwargs, streaming=True)
