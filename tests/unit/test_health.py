@@ -1,7 +1,31 @@
-def test_health(client):
-  response = client.get("/health")
-  assert response.status_code == 200
-  data = response.json()
-  assert data["status"] == "ok"
-  assert "version" in data
-  assert "env" in data
+def _patch_qdrant(monkeypatch, ok: bool) -> None:
+    from app.api import health as health_mod
+
+    monkeypatch.setattr(health_mod, "_qdrant_connected", lambda: ok)
+    monkeypatch.setattr(health_mod, "_qdrant_probe_cache", (0.0, ok))
+
+
+def test_healthz_returns_ready_when_qdrant_up(client, monkeypatch):
+    """Qdrant 연결 OK → 200 + status="ready", 응답에 model 정보 포함."""
+    _patch_qdrant(monkeypatch, True)
+
+    resp = client.get("/healthz")
+    assert resp.status_code == 200
+
+    body = resp.json()
+    assert body["status"] == "ready"
+    assert "model" in body
+    assert "embedding_model" in body
+    assert body["qdrant_connected"] is True
+
+
+def test_healthz_returns_loading_when_qdrant_down(client, monkeypatch):
+    """Qdrant 미연결 → 503 + status="loading" + ready_in_seconds 노출."""
+    _patch_qdrant(monkeypatch, False)
+
+    resp = client.get("/healthz")
+    assert resp.status_code == 503
+
+    body = resp.json()
+    assert body["status"] == "loading"
+    assert body["ready_in_seconds"] >= 0
