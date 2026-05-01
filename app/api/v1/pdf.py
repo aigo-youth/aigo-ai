@@ -79,7 +79,7 @@ async def analyze_pdf(
                 raise _http_error(
                     "PAYLOAD_TOO_LARGE",
                     f"파일 크기가 한도({max_bytes // (1024 * 1024)}MB)를 초과합니다.",
-                    status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                    status.HTTP_413_CONTENT_TOO_LARGE,
                 )
 
         if not contents.startswith(b"%PDF"):
