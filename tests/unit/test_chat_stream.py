@@ -116,6 +116,33 @@ def test_chat_stream_emits_spec_events(client, mock_stream_chat):
     assert end["data"]["fallback_triggered"] is False
 
 
+def test_chat_stream_emits_keepalive_ping_when_idle(client, monkeypatch):
+    """producer 가 이벤트를 늦게 내보내면 SSE 코멘트 ping(`: ping`) 이 흘러야 함"""
+    import asyncio as _asyncio
+
+    from app.api.v1 import chat as chat_module
+    from app.services import chat_service
+
+    async def slow_stream(query, history=None, contract_context=None):
+        await _asyncio.sleep(0.15)
+        yield {
+            "event": "message_end",
+            "data": {"total_tokens": 0, "fallback_triggered": False, "latency_ms": 0},
+        }
+
+    monkeypatch.setattr(chat_service, "stream_chat", slow_stream)
+    monkeypatch.setattr(chat_module, "_KEEPALIVE_INTERVAL", 0.02)
+
+    resp = client.post(
+        "/v1/chat/stream",
+        json={"query": "느린 응답"},
+        headers=_HEADERS,
+    )
+    assert resp.status_code == 200
+    assert ": ping" in resp.text
+    assert "event: message_end" in resp.text
+
+
 def test_chat_stream_with_full_payload(client, mock_stream_chat):
     """history + contract_context 가 모두 채워진 요청을 수용"""
     resp = client.post(
