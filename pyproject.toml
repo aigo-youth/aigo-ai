@@ -17,6 +17,8 @@ dependencies = [
     "pandas>=3.0.2",
     "psutil>=7.2.2",
     "pypdf>=5.0.0",
+    "pymupdf>=1.24.0",
+    "paddleocr>=2.10.0",
     "python-dotenv>=1.2.2",
     "qdrant-client>=1.17.1",
     "requests>=2.33.1",
@@ -30,7 +32,6 @@ dependencies = [
     "pydantic-settings>=2.14.0",
     "structlog>=25.5.0",
     "python-multipart>=0.0.27",
-    "fitz>=0.0.1.dev2",
 ]
 
 [dependency-groups]
