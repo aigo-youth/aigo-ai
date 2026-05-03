@@ -47,7 +47,7 @@ class Settings(BaseSettings):
     # PDF / OCR 한도
     MAX_PDF_BYTES: int = 5 * 1024 * 1024  # 5MB
     MAX_PDF_PAGES: int = 50
-    OCR_TIMEOUT_SECONDS: int = 60
+    OCR_TIMEOUT_SECONDS: int = 300
 
     OC: str = ""
 
