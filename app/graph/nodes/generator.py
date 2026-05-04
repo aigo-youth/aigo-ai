@@ -1,6 +1,9 @@
-from app.graph.state import State
-from app.llm import llm
+from collections.abc import Generator
+
 from langchain_core.messages import HumanMessage, SystemMessage
+
+from app.graph.state import State
+from app.llm import llm, streaming_llm
 
 GENERATOR_SYSTEM_PROMPT = """\
 당신은 '아이고 청년' 서비스의 AI 부동산 계약 조항 검토 전문가입니다.
@@ -13,16 +16,32 @@ GENERATOR_SYSTEM_PROMPT = """\
 [제약조건(Constraints)]
 - 제공된 참고 문서를 기반으로 답변하세요.
 - 문서에 없는 내용은 추측하거나 지어내지 마세요.
-- 모든 답변에 반드시 출처(법령명, 조문번호, 판례번호)를 명시하세요.
-- 확답 표현(반드시, 무조건, 절대적으로, 100% 등)은 사용하지 마세요.
+- 모든 답변에 출처(법령명, 조문번호, 판례번호)를 명시하세요. (별도의 출처 섹션은 시스템이 자동으로 덧붙입니다.)
 - 법률적 판단이나 개인 법률 자문은 제공하지 않습니다.
-- 간결하고 명확하게 답변하세요."""
+
+[표현 제약 — 매우 중요]
+다음 단정적 표현은 절대 사용하지 말고 반드시 대체 표현을 사용하세요:
+- "반드시" → "일반적으로"
+- "무조건" → "대부분의 경우"
+- "절대적으로" → "대체로"
+- "확실히" → "일반적으로 보면"
+- "틀림없이" → "보통은"
+- "100%" → "대부분"
+"절대", "무조건적", "100% 맞다", "확답드립니다" 등의 단정 표현 역시 금지.
+
+[출력 스타일]
+- 불필요한 서두("물론입니다", "좋은 질문입니다" 등) 제거.
+- 핵심 내용 위주로 구조화 (필요 시 번호 목록 사용).
+- 문장은 간결하게 (한 문장에 하나의 내용만).
+- 마크다운 형식 유지.
+- 답변은 "답변:" 으로 시작하고, 이후 핵심 내용을 쉬운 말로 설명.
+"""
 
 MAX_HISTORY = 10
 
 
-def generator(state: State) -> dict:
-    """검색 문서 기반 답변 생성. 출처 URL은 resolve_citations 노드에서 처리."""
+def _build_messages(state: State) -> list:
+    """generator/stream_generator가 공유하는 메시지 빌더."""
     user_input = state['user_input']
     retrieved_docs = state.get('retrieved_docs', [])
     history = state.get('messages', [])[-MAX_HISTORY:]
@@ -32,15 +51,25 @@ def generator(state: State) -> dict:
         for doc in retrieved_docs
     )
 
-    messages = [
+    return [
         SystemMessage(content=GENERATOR_SYSTEM_PROMPT),
         *history,
-        HumanMessage(content=f"참고 문서:\n{context}\n\n질문: {user_input}")
+        HumanMessage(content=f"참고 문서:\n{context}\n\n질문: {user_input}"),
     ]
 
-    final_response = llm.invoke(messages)
+
+def generator(state: State) -> dict:
+    """비-스트리밍 경로용 — 검색 문서 기반 답변 생성."""
+    final_response = llm.invoke(_build_messages(state))
 
     return {
         'messages': [HumanMessage(content=state['user_input'])],
         'final_answer': final_response.content,
     }
+
+
+def stream_generator(state: State) -> Generator[str, None, None]:
+    """스트리밍 경로용 — generator 출력을 토큰 단위로 yield."""
+    for chunk in streaming_llm.stream(_build_messages(state)):
+        if chunk.content:
+            yield chunk.content
