@@ -3,7 +3,10 @@ import contextlib
 import time
 from typing import AsyncIterator, Iterable
 
+from app.core.logging import get_logger
 from app.graph import run_preformat, stream_formatter
+
+logger = get_logger(__name__)
 
 
 def _safe_hit_count(state: dict) -> int:
@@ -43,7 +46,12 @@ async def stream_chat(
 
     try:
         state = await asyncio.to_thread(run_preformat, query)
-    except Exception:
+    except Exception as exc:
+        logger.error(
+            "chat_service.preformat_failed",
+            error=str(exc),
+            exc_type=type(exc).__name__,
+        )
         yield {
             "event": "error",
             "data": {

@@ -1,8 +1,23 @@
 from app.pdf_graph.state import PDF_State
+from app.settings import settings
 import fitz
 import numpy as np
 
 from paddleocr import PaddleOCR
+
+
+def _resolve_device(preference: str) -> str:
+    pref = (preference or "auto").strip().lower()
+    if pref != "auto":
+        return pref
+    try:
+        import torch
+        if torch.cuda.is_available() and torch.cuda.device_count() > 0:
+            return "gpu"
+    except Exception:
+        pass
+    return "cpu"
+
 
 # 콜드스타트 문제로 이걸 빼놓았는데, 아래 노드에 합쳐야하는지가 고민...
 
@@ -12,7 +27,7 @@ ocr = PaddleOCR(
     use_doc_orientation_classify=False,                         # 문서 전체가 몇 도 회전됐는지 감지하고 보정
     use_doc_unwarping=False,                                    # 구겨지거나 휘어진 문서를 펴는 보정
     use_textline_orientation=False,                             # 텍스트 줄이 가로/세로인지 판단해주는 보정
-    device='gpu'
+    device=_resolve_device(settings.OCR_DEVICE),
 )
 
 def scan_to_text(state: PDF_State) -> dict:

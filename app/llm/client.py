@@ -6,8 +6,8 @@ _kwargs: dict = {
     "model": settings.LLM_MODEL,
     "api_key": settings.LLM_API_KEY,
     "temperature": 0.3,
-    "timeout": 30,
-    "max_retries": 1,
+    "timeout": 90,
+    "max_retries": 0,
 }
 
 if settings.LLM_BASE_URL:
