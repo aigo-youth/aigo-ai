@@ -48,6 +48,9 @@ class Settings(BaseSettings):
     MAX_PDF_BYTES: int = 5 * 1024 * 1024  # 5MB
     MAX_PDF_PAGES: int = 50
     OCR_TIMEOUT_SECONDS: int = 300
+    # PaddleOCR 디바이스: "auto" | "gpu" | "cpu" | "gpu:0" 등.
+    # auto 이면 torch.cuda.is_available() 로 gpu/cpu 자동 선택.
+    OCR_DEVICE: str = "auto"
 
     OC: str = ""
 
